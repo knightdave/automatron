@@ -8,8 +8,10 @@ pip download -d ./automatron/packages -r requirements.txt
 cat << EOF >> ./automatron/install.sh
 #!/bin/bash
 
-bash Miniconda2-latest-Linux-x86_64.sh -b -p $HOME/miniconda
+bash Miniconda.sh -b -p $HOME/miniconda
 pip install --no-index --find-links="./packages/" ansible
+
+echo "Remmember to set PATH"
 EOF
 
 [[ ! -d ./makeself ]] && git clone https://github.com/megastep/makeself.git
