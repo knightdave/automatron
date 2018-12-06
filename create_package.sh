@@ -1,19 +1,83 @@
 #!/bin/bash
 
-[[ ! -d ./automatron ]] && mkdir automatron
-[[ ! -d ./automatron/packages ]] && mkdir automatron
-wget -O ./automatron/Miniconda.sh https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh
-pip download -d ./automatron/packages -r requirements.txt
 
-cat << EOF >> ./automatron/install.sh
-#!/bin/bash
+function usage() {
+	echo "-t	temporary dir (default current dir)"
+	echo "-r	path to requirements.txt file"
+	echo "-k	keep files for future (default not keep)"
+	exit 1
+}
 
-bash Miniconda.sh -b -p $HOME/miniconda
-pip install --no-index --find-links="./packages/" ansible
+function process_parameters() {
+	[[ ${#@} -eq 0 ]] && usage
+	while getopts d:w:l:s:a:h:t:f:u:p:c: Option
+	do
+		case "${Option}" in
+			r) REQUIREMENTS_FILE="${OPTARG}"
+			;;
+			t) TMPDIR="${OPTARG}"
+			;;
+			k) KEEP=true
+			;;
+			*) usage
+			;;
+		esac
+	done
 
-echo "Remmember to set PATH"
-EOF
+  return 0
+}
 
-[[ ! -d ./makeself ]] && git clone https://github.com/megastep/makeself.git
-./makeself/makeself.sh automatron automatron.sh "Conda distribution with automation tools" ./install.sh
-rm -rf ./automatron
+function prepare_environment() {
+
+    [[ ! -d "${TMPDIR}"/automatron ]] && mkdir "${TMPDIR}"/automatron
+    [[ ! -d "${TMPDIR}"/automatron/packages ]] && mkdir "${TMPDIR}"/automatron/packages
+    wget -O "${TMPDIR}"/automatron/Miniconda.sh https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh
+
+    if [[ ! -d "${TMPDIR}"/makeself ]]; then
+        git clone https://github.com/megastep/makeself.git "${TMPDIR}"/makeself
+    else
+        cd "${TMPDIR}"/makeself
+        git init
+        git remote add origin https://github.com/megastep/makeself.git 2>/dev/null
+        git pull
+    fi
+
+}
+
+function cleanup() {
+    rm -rf "${TMPDIR}"/automatron
+    rm -rf "${TMPDIR}"/makeself
+}
+
+function main() {
+
+process_parameters "${@}"
+prepare_environment
+
+if [[ "${REQUIREMENTS_FILE}x" = "x" ]]; then
+    pip download -d "${TMPDIR}"/automatron/packages $DEFAULT_PKGS
+else
+    pip download -d "${TMPDIR}"/automatron/packages -r ${REQUIREMENTS_FILE}
+fi
+cp ${DIRECTORY}/.install.sh "${TMPDIR}"/automatron/install.sh
+
+
+"${TMPDIR}"/makeself/makeself.sh "${TMPDIR}"/automatron automatron.sh "Conda distribution with automation tools" ./install.sh
+
+[[ ! ${KEEP} = true ]] && cleanup
+
+}
+
+
+##########################
+#GLOBAL VARIABLES
+##########################
+DIRECTORY=$(dirname $0)
+REQUIREMENTS_FILE=""
+TMPDIR=$(pwd)
+KEEP=false
+DEFAULT_PKGS="ansible awscli docker molecule fabric invocations patchwork robotframework robotframework-requests robotframework-sudslibrary"
+
+
+
+main "${@}"
