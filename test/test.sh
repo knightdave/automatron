@@ -42,36 +42,39 @@ function upgrade_pip(){
 #--------- Test Cases ---------#
 
 function pip_checking_too_low(){
-    print_testcase ${0}
-    check_pip_version || testcase_success ${0}
+    print_testcase ${FUNCNAME[0]}
+    check_pip_version || testcase_success ${FUNCNAME[0]}
 }
 
 function pip_checking_enough(){
-    print_testcase ${0}
-    check_pip_version && testcase_success ${0}
+    print_testcase ${FUNCNAME[0]}
+    check_pip_version && testcase_success ${FUNCNAME[0]}
 }
 
 function create_package_auto(){
-    print_testcase ${0}
+    print_testcase ${FUNCNAME[0]}
     print_info "Creating package..."
     ./create_package.sh
     print_info "Checking is created..."
-    [[ -f automatron.sh ]] && testcase_success ${0} || testcase_fail ${0}
+    [[ -f automatron.sh ]] && testcase_success ${FUNCNAME[0]} || testcase_fail ${FUNCNAME[0]}
 }
 
 function install_package_auto(){
-    print_testcase ${0}
+    print_testcase ${FUNCNAME[0]}
     ./automatron.sh
-    [[ -d ~/miniconda ]] || testcase_fail ${0}
+    [[ -d ~/miniconda ]] || testcase_fail ${FUNCNAME[0]}
     export PATH="${HOME}/miniconda/bin:$PATH"
-    python -c "import ansible" || testcase_fail ${0}
-    testcase_success ${0} 
+    python -c "import ansible" || testcase_fail ${FUNCNAME[0]}
+    testcase_success ${FUNCNAME[0]} 
 }
 
 
 function main(){
     cleanup
     print_environment
+    pip install virtualenv
+    virtualenv virtenv
+    source virtenv/bin/activate
     pip_checking_too_low
     upgrade_pip
     pip_checking_enough
