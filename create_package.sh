@@ -34,9 +34,7 @@ function process_parameters() {
 function check_pip_version() {
 	PIP_VERSION=$(pip --version | awk -F'[" ".]' '{print $2}')
 	if [[ $PIP_VERSION -lt $MIN_PIP_VERSION ]]; then
-		echo false
-	else
-		echo true
+		print_error "Your pip version is lower then minimal $MIN_PIP_VERSION. Please upgrade pip."
 	fi
 }
 
@@ -44,12 +42,10 @@ function check_python_version() {
 	PYTHON_VERSION=$(python --version 2>&1 | awk -F'[" ".]' '{print $2}')
 	if [[ $PYTHON_VERSION = 2 ]]; then
 		DOWNLOAD=$MINICONDA2
-		echo true
 	elif [[ $PYTHON_VERSION = 3 ]]; then
 		DOWNLOAD=$MINICONDA3
-		echo true
 	else
-		echo false
+		print_error "Cannot check python version. Check is python exists in your PATH"
 	fi
 }
 
@@ -77,8 +73,8 @@ function cleanup() {
 
 function main() {
 	process_parameters "${@}"
-	[[ ! $(check_pip_version) = true ]] && print_error "Your pip version is lower then minimal $MIN_PIP_VERSION. Please upgrade pip."
-	[[ ! $(check_python_version) = true ]] && print_error "Cannot check python version. Check is python exists in your PATH"
+	check_pip_version
+	check_python_version
 	prepare_environment
 
 	if [[ "${REQUIREMENTS_FILE}x" = "x" ]]; then

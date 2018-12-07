@@ -41,20 +41,10 @@ function upgrade_pip(){
 
 #--------- Test Cases ---------#
 
-function pip_checking_too_low(){
-    print_testcase ${FUNCNAME[0]}
-    [[ ! $(check_pip_version) = true ]] && testcase_success ${FUNCNAME[0]}
-}
-
-function pip_checking_enough(){
-    print_testcase ${FUNCNAME[0]}
-    [[ $(check_pip_version) = true ]] && testcase_success ${FUNCNAME[0]}
-}
-
 function create_package_auto(){
     print_testcase ${FUNCNAME[0]}
     print_info "Creating package..."
-    sh create_package.sh
+    ./create_package.sh
     print_info "Checking is created..."
     [[ -f automatron.sh ]] && testcase_success ${FUNCNAME[0]} || testcase_fail ${FUNCNAME[0]}
 }
@@ -75,9 +65,7 @@ function main(){
     pip install virtualenv
     virtualenv virtenv
     source virtenv/bin/activate
-    pip_checking_too_low
     upgrade_pip
-    pip_checking_enough
     create_package_auto
     install_package_auto
     cleanup
