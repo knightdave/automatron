@@ -33,7 +33,7 @@ function main() {
         bash Miniconda.sh -b -p "${PREFIX}"
     fi
 
-    export PATH="${PREFIX}:$PATH"
+    export PATH="${PREFIX}/bin:$PATH"
 
     if [[ -f requirements.txt ]]; then
         pip install --no-index --find-links="./packages/" -r requirements.txt

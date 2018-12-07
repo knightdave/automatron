@@ -2,7 +2,7 @@
 
 
 function print_error(){
-	echo "[ERROR] &@"
+	echo "[$(date)] [ERROR] ${@}"
 	exit 1
 }
 
