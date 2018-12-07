@@ -1,6 +1,11 @@
 #!/bin/bash
 
 
+function print_error(){
+	echo "[ERROR] &@"
+	exit 1
+}
+
 function usage() {
 	echo "-t	temporary dir (default current dir)"
 	echo "-r	path to requirements.txt file"
@@ -9,8 +14,7 @@ function usage() {
 }
 
 function process_parameters() {
-	[[ ${#@} -eq 0 ]] && usage
-	while getopts d:w:l:s:a:h:t:f:u:p:c: Option
+	while getopts r:t:k: Option
 	do
 		case "${Option}" in
 			r) REQUIREMENTS_FILE="${OPTARG}"
@@ -27,11 +31,29 @@ function process_parameters() {
   return 0
 }
 
+function check_pip_version() {
+	PIP_VERSION=$(pip --version | awk -F'[" ".]' '{print $2}')
+	if [[ $PIP_VERSION -lt $MIN_PIP_VERSION ]]; then
+		print_error "Your pip version is lower then minimal $MIN_PIP_VERSION. Please upgrade pip."
+	fi
+}
+
+function check_python_version() {
+	PYTHON_VERSION=$(python --version 2>&1 | awk -F'[" ".]' '{print $2}')
+	if [[ $PYTHON_VERSION = 2 ]]; then
+		DOWNLOAD=$MINICONDA2
+	elif [[ $PYTHON_VERSION = 3 ]]; then
+		DOWNLOAD=$MINICONDA3
+	else
+		print_error "Cannot check python version. Check is python exists in your PATH"
+	fi
+}
+
 function prepare_environment() {
 
     [[ ! -d "${TMPDIR}"/automatron ]] && mkdir "${TMPDIR}"/automatron
     [[ ! -d "${TMPDIR}"/automatron/packages ]] && mkdir "${TMPDIR}"/automatron/packages
-    wget -O "${TMPDIR}"/automatron/Miniconda.sh https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh
+    wget -O "${TMPDIR}"/automatron/Miniconda.sh $DOWNLOAD
 
     if [[ ! -d "${TMPDIR}"/makeself ]]; then
         git clone https://github.com/megastep/makeself.git "${TMPDIR}"/makeself
@@ -50,22 +72,22 @@ function cleanup() {
 }
 
 function main() {
+	process_parameters "${@}"
+	check_pip_version
+	check_python_version
+	prepare_environment
 
-process_parameters "${@}"
-prepare_environment
-
-if [[ "${REQUIREMENTS_FILE}x" = "x" ]]; then
-    pip download -d "${TMPDIR}"/automatron/packages $DEFAULT_PKGS
-else
-    pip download -d "${TMPDIR}"/automatron/packages -r ${REQUIREMENTS_FILE}
-fi
-cp ${DIRECTORY}/.install.sh "${TMPDIR}"/automatron/install.sh
+	if [[ "${REQUIREMENTS_FILE}x" = "x" ]]; then
+		pip download -d "${TMPDIR}"/automatron/packages $DEFAULT_PKGS
+	else
+		pip download -d "${TMPDIR}"/automatron/packages -r ${REQUIREMENTS_FILE}
+	fi
+	cp ${DIRECTORY}/.install.sh "${TMPDIR}"/automatron/install.sh
 
 
-"${TMPDIR}"/makeself/makeself.sh "${TMPDIR}"/automatron automatron.sh "Conda distribution with automation tools" ./install.sh
+	"${TMPDIR}"/makeself/makeself.sh "${TMPDIR}"/automatron automatron.sh "Conda distribution with automation tools" ./install.sh
 
-[[ ! ${KEEP} = true ]] && cleanup
-
+	[[ ! ${KEEP} = true ]] && cleanup
 }
 
 
@@ -73,9 +95,14 @@ cp ${DIRECTORY}/.install.sh "${TMPDIR}"/automatron/install.sh
 #GLOBAL VARIABLES
 ##########################
 DIRECTORY=$(dirname $0)
+PYTHON_VERSION=2
 REQUIREMENTS_FILE=""
+MINICONDA2="https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh"
+MINICONDA3="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+DOWNLOAD="${MINICONDA2}"
 TMPDIR=$(pwd)
 KEEP=false
+MIN_PIP_VERSION=10
 DEFAULT_PKGS="ansible awscli docker molecule fabric invocations patchwork robotframework robotframework-requests robotframework-sudslibrary"
 
 

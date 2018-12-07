@@ -7,8 +7,7 @@ function usage() {
 }
 
 function process_parameters() {
-	[[ ${#@} -eq 0 ]] && usage
-	while getopts d:w:l:s:a:h:t:f:u:p:c: Option
+	while getopts f:p: Option
 	do
 		case "${Option}" in
     		f) FORCE=true
