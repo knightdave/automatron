@@ -1,5 +1,5 @@
 #!/bin/bash
-. ../create_package
+. ../create_package.sh
 
 function print_info(){
 	echo "[$(date)] [INFO] ${@}"
