@@ -43,18 +43,18 @@ function upgrade_pip(){
 
 function pip_checking_too_low(){
     print_testcase ${FUNCNAME[0]}
-    check_pip_version || testcase_success ${FUNCNAME[0]}
+    [[ ! $(check_pip_version) = true ]] && testcase_success ${FUNCNAME[0]}
 }
 
 function pip_checking_enough(){
     print_testcase ${FUNCNAME[0]}
-    check_pip_version && testcase_success ${FUNCNAME[0]}
+    [[ $(check_pip_version) = true ]] && testcase_success ${FUNCNAME[0]}
 }
 
 function create_package_auto(){
     print_testcase ${FUNCNAME[0]}
     print_info "Creating package..."
-    ./create_package.sh
+    sh create_package.sh
     print_info "Checking is created..."
     [[ -f automatron.sh ]] && testcase_success ${FUNCNAME[0]} || testcase_fail ${FUNCNAME[0]}
 }
