@@ -1,7 +1,7 @@
 Automatron
 ==============
 
-https://travis-ci.com/knightdave/automatron.svg?branch=master
+[![Build Status](https://travis-ci.com/knightdave/automatron.svg?branch=master)](https://travis-ci.com/knightdave/automatron)
 
 Package python Conda with automation libraries.
 - ansible

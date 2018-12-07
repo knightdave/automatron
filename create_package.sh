@@ -51,9 +51,9 @@ function check_python_version() {
 
 function prepare_environment() {
 
-    [[ ! -d "${TMPDIR}"/automatron ]] && mkdir "${TMPDIR}"/automatron
-    [[ ! -d "${TMPDIR}"/automatron/packages ]] && mkdir "${TMPDIR}"/automatron/packages
-    wget -O "${TMPDIR}"/automatron/Miniconda.sh $DOWNLOAD
+    [[ ! -d "${TMPDIR}"/automatr ]] && mkdir "${TMPDIR}"/automatr
+    [[ ! -d "${TMPDIR}"/automatr/packages ]] && mkdir "${TMPDIR}"/automatr/packages
+    wget -O "${TMPDIR}"/automatr/Miniconda.sh $DOWNLOAD
 
     if [[ ! -d "${TMPDIR}"/makeself ]]; then
         git clone https://github.com/megastep/makeself.git "${TMPDIR}"/makeself
@@ -67,7 +67,7 @@ function prepare_environment() {
 }
 
 function cleanup() {
-    rm -rf "${TMPDIR}"/automatron
+    rm -rf "${TMPDIR}"/automatr
     rm -rf "${TMPDIR}"/makeself
 }
 
@@ -78,14 +78,14 @@ function main() {
 	prepare_environment
 
 	if [[ "${REQUIREMENTS_FILE}x" = "x" ]]; then
-		pip download -d "${TMPDIR}"/automatron/packages $DEFAULT_PKGS
+		pip download -d "${TMPDIR}"/automatr/packages $DEFAULT_PKGS
 	else
-		pip download -d "${TMPDIR}"/automatron/packages -r ${REQUIREMENTS_FILE}
+		pip download -d "${TMPDIR}"/automatr/packages -r ${REQUIREMENTS_FILE}
 	fi
-	cp ${DIRECTORY}/.install.sh "${TMPDIR}"/automatron/install.sh
+	cp ${DIRECTORY}/.install.sh "${TMPDIR}"/automatr/install.sh
 
 
-	"${TMPDIR}"/makeself/makeself.sh "${TMPDIR}"/automatron automatron.sh "Conda distribution with automation tools" ./install.sh
+	"${TMPDIR}"/makeself/makeself.sh "${TMPDIR}"/automatr automatron.sh "Conda distribution with automation tools" ./install.sh
 
 	[[ ! ${KEEP} = true ]] && cleanup
 }
