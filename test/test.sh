@@ -1,5 +1,5 @@
 #!/bin/bash
-. ../create_package.sh
+. create_package.sh
 
 function print_info(){
 	echo "[$(date)] [INFO] ${@}"
@@ -28,10 +28,10 @@ function print_environment(){
 
 function cleanup() {
     print_info "Cleaning environment"
-    [[ -d ../miniconda ]] && rm -rf miniconda
-    [[ -d ../makeself ]] && rm -rf makeself
-    [[ -d ../automatr ]] && rm -rf automatr
-    [[ -f ../automatron.sh ]] && rm -f automatron.sh
+    [[ -d ./miniconda ]] && rm -rf miniconda
+    [[ -d ./makeself ]] && rm -rf makeself
+    [[ -d ./automatr ]] && rm -rf automatr
+    [[ -f ./automatron.sh ]] && rm -f automatron.sh
     [[ -d $PREFIX ]] && rm -rf $PREFIX
 }
 
@@ -61,7 +61,7 @@ function create_package_auto(){
 
 function install_package_auto(){
     print_testcase ${FUNCNAME[0]}
-    ./automatron.sh
+    sh automatron.sh
     [[ -d ~/miniconda ]] || testcase_fail ${FUNCNAME[0]}
     export PATH="${HOME}/miniconda/bin:$PATH"
     python -c "import ansible" || testcase_fail ${FUNCNAME[0]}
