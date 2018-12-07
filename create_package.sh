@@ -103,7 +103,7 @@ DOWNLOAD="${MINICONDA2}"
 TMPDIR=$(pwd)
 KEEP=false
 MIN_PIP_VERSION=10
-DEFAULT_PKGS="ansible awscli docker molecule fabric invocations patchwork robotframework robotframework-requests robotframework-sudslibrary"
+DEFAULT_PKGS="ansible awscli docker molecule fabric patchwork robotframework robotframework-requests robotframework-sudslibrary"
 
 
 
