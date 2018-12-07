@@ -26,7 +26,7 @@ function create_package_auto(){
     [[ -f automatron.sh ]] || print_error "Package not created"
 }
 
-fuction install_package_auto(){
+function install_package_auto(){
     print_testcase ${0}
     ./automatron.sh
     [[ -d ~/miniconda ]] || print_error "miniconda not installed"
