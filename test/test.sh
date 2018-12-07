@@ -15,6 +15,12 @@ function print_testcase(){
     echo ""
 }
 
+function print_environment(){
+    print_info $(uname -a)
+	print_info $(python --version)
+    print_info $(pip --version)
+}
+
 
 #--------- Test Cases ---------#
 
@@ -37,6 +43,7 @@ function install_package_auto(){
 
 
 function main(){
+    print_environment
     create_package_auto
     install_package_auto
 }
