@@ -48,11 +48,8 @@ The syntacs of automatron is following
 
 ### Dependencies
 
-For `create_package.sh`:
-- python with pip >= 10.0
-
-For `./automatron.sh`;
 - gcc (needded to compile wheels)
+- Only Linux support (yet...)
 
 [conda]: https://conda.io/miniconda.html
 [makeself]: https://makeself.io
