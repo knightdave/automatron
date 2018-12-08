@@ -1,10 +1,5 @@
 language: bash
 
 script:
-    - bash create_package.sh && \
-        bash automatron.sh && \
-        PATH=$HOME/miniconda/bin:$PATH python -c 'import ansible, platform; print platform.python_version()' && \
-        rm -rf $HOME/miniconda
-    - bash create_package.sh -p 3 && \
-        bash automatron.sh -- "\-f" && \
-        PATH=$HOME/miniconda/bin:$PATH python -c 'import ansible, platform; print(platform.python_version())'
+    - bash create_package.sh && bash automatron.sh && PATH=$HOME/miniconda/bin:$PATH python -c 'import ansible, platform; print platform.python_version()' && rm -rf $HOME/miniconda
+    - bash create_package.sh -p 3 && bash automatron.sh -- -f -f && PATH=$HOME/miniconda/bin:$PATH python -c 'import ansible, platform; print(platform.python_version())'
