@@ -20,7 +20,7 @@ Create portable python installer with automation tools in tree simple steps:
     ```sh
     ./create_package.sh
     ```
-2. Copy automatron.sh to any place and run installation:
+2. Copy automatron.sh to Linux server and run installation:
     ```sh
     ./automatron.sh
     ```
