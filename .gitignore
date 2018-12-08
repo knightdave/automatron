@@ -1,3 +1,9 @@
-automatron
-automatron.sh
+automatr*
 makeself
+pip*
+virtenv
+Vagrantfile
+Dockerfile
+.vagrant
+*.log
+miniconda

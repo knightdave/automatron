@@ -53,6 +53,6 @@ function main() {
 FORCE=false
 REQUIREMENTS_FILE=None
 PREFIX="${HOME}/miniconda"
-DEFAULT_PKGS="ansible awscli docker molecule fabric patchwork robotframework robotframework-requests robotframework-sudslibrary"
+DEFAULT_PKGS="ansible awscli docker molecule fabric patchwork robotframework robotframework-requests"
 
 main "${@}"

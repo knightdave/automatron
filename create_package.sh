@@ -23,7 +23,7 @@ function usage() {
 }
 
 function process_parameters() {
-	while getopts r:t:k: Option
+	while getopts r:t:k:p: Option
 	do
 		case "${Option}" in
 			r) REQUIREMENTS_FILE="${OPTARG}"
@@ -43,7 +43,6 @@ function process_parameters() {
 }
 
 function check_python_version() {
-	PYTHON_VERSION=$(python --version 2>&1 | awk -F'[" ".]' '{print $2}')
 	if [[ $PYTHON_VERSION = 2 ]]; then
 		DOWNLOAD=$MINICONDA2
 	elif [[ $PYTHON_VERSION = 3 ]]; then
@@ -54,9 +53,9 @@ function check_python_version() {
 }
 
 function my_pip() {
-	if [[ $PYTHON_VERSION = 2 ]]; then
+	if [[ ${PYTHON_VERSION} = 2 ]]; then
 		python -m pip "${@}"
-	elif [[ $PYTHON_VERSION = 3 ]]; then
+	elif [[ ${PYTHON_VERSION} = 3 ]]; then
 		python3 -m pip "${@}"
 	else
 		print_error "Wrong Python version: $PYTHON_VERSION"
@@ -65,50 +64,51 @@ function my_pip() {
 
 function check_pip_version() {
 	PIP_VERSION=$(my_pip --version | awk -F'[" ".]' '{print $2}')
-	if [[ $PIP_VERSION -lt $MIN_PIP_VERSION ]]; then
-		print_error "Your pip version is lower then minimal $MIN_PIP_VERSION. Please upgrade pip."
+	if [[ ${PIP_VERSION} -lt ${MIN_PIP_VERSION} ]]; then
+		print_error "Your pip version is lower then minimal ${MIN_PIP_VERSION}. Please upgrade pip."
 	fi
 }
 
 function prepare_environment() {
+	[[ ! -d "${TMP_PATH}" ]] && mkdir "${TMP_PATH}"
+    [[ ! -d "${TMP_PATH}/automatron" ]] && mkdir "${TMP_PATH}/automatron"
+    [[ ! -d "${TMP_PATH}/automatron/packages" ]] && mkdir "${TMP_PATH}/automatron/packages"
+    wget -O "${TMP_PATH}/automatron/Miniconda.sh" "${DOWNLOAD}"
 
-    [[ ! -d "${TMPDIR}"/automatr ]] && mkdir "${TMPDIR}"/automatr
-    [[ ! -d "${TMPDIR}"/automatr/packages ]] && mkdir "${TMPDIR}"/automatr/packages
-    wget -O "${TMPDIR}"/automatr/Miniconda.sh $DOWNLOAD
-
-    if [[ ! -d "${TMPDIR}"/makeself ]]; then
-        git clone https://github.com/megastep/makeself.git "${TMPDIR}"/makeself
+    if [[ ! -d "${TMP_PATH}/makeself" ]]; then
+        git clone https://github.com/megastep/makeself.git "${TMP_PATH}/makeself"
     else
-        cd "${TMPDIR}"/makeself
+        cd "${TMP_PATH}/makeself"
         git init
         git remote add origin https://github.com/megastep/makeself.git 2>/dev/null
         git pull
+		cd "${MAIN_DIRECTORY}"
     fi
+	sh "${TMP_PATH}/automatron/Miniconda.sh" -f -b -p "${TMP_PATH}/miniconda"
+	export PATH="${TMPDIR}/automatron/miniconda/bin:${PATH}"
 
 }
 
 function cleanup() {
-    rm -rf "${TMPDIR}"/automatr
-    rm -rf "${TMPDIR}"/makeself
+    [[ -d "${TMP_PATH}" ]] && rm -rf "${TMP_PATH}"
 }
 
 function main() {
 	process_parameters "${@}"
-	if [[ ${PYTHON_VERSION}x = x ]]; then
-		check_python_version
-	fi
-	check_pip_version
+	check_python_version
 	prepare_environment
+	check_pip_version
+	
 
 	if [[ "${REQUIREMENTS_FILE}x" = "x" ]]; then
-		my_pip download -d "${TMPDIR}"/automatr/packages $DEFAULT_PKGS
+		my_pip download -d "${TMP_PATH}/automatron/packages" ${DEFAULT_PKGS}
 	else
-		my_pip download -d "${TMPDIR}"/automatr/packages -r ${REQUIREMENTS_FILE}
+		my_pip download -d "${TMP_PATH}/automatron/packages" -r ${REQUIREMENTS_FILE}
 	fi
-	cp ${DIRECTORY}/.install.sh "${TMPDIR}"/automatr/install.sh
+	cp "${MAIN_DIRECTORY}/.install.sh" "${TMP_PATH}/automatron/install.sh"
 
 
-	"${TMPDIR}"/makeself/makeself.sh "${TMPDIR}"/automatr automatron.sh "Conda distribution with automation tools" ./install.sh
+	"${TMP_PATH}/makeself/makeself.sh" "${TMP_PATH}/automatron" automatron.sh "Conda distribution with automation tools" ./install.sh
 
 	[[ ! ${KEEP} = true ]] && cleanup
 }
@@ -117,16 +117,18 @@ function main() {
 ##########################
 #GLOBAL VARIABLES
 ##########################
-DIRECTORY=$(dirname $0)
-PYTHON_VERSION=""
+MAIN_DIRECTORY=$(dirname $0)
+PYTHON_VERSION="2"
 REQUIREMENTS_FILE=""
 MINICONDA2="https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh"
 MINICONDA3="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
 DOWNLOAD="${MINICONDA2}"
-TMPDIR=$(pwd)
+TMPDIR=/tmp
+TMP_PATH="${TMPDIR}/automatron"
+
 KEEP=false
 MIN_PIP_VERSION=10
-DEFAULT_PKGS="ansible awscli docker molecule fabric patchwork robotframework robotframework-requests robotframework-sudslibrary"
+DEFAULT_PKGS="ansible awscli docker molecule fabric patchwork robotframework robotframework-requests"
 
 
 

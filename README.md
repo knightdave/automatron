@@ -1,6 +1,7 @@
 Automatron
 ==============
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Build Status](https://travis-ci.com/knightdave/automatron.svg?branch=master)](https://travis-ci.com/knightdave/automatron)
 
 Easy way to create automation ready Python installer with [miniconda][conda] and [makeself][makeself].
@@ -41,9 +42,17 @@ The syntacs of automatron is following
 
 `./automatron.sh -- [args]`
 - args are optional:
-    - `-f` : force installation
-    - `-p` : installation path (default: ~/miniconda)
+    - `\-f` : force installation
+    - `\-p` : installation path (default: ~/miniconda)
 
+
+### Dependencies
+
+For `create_package.sh`:
+- python with pip >= 10.0
+
+For `./automatron.sh`;
+- gcc (needded to compile wheels)
 
 [conda]: https://conda.io/miniconda.html
 [makeself]: https://makeself.io
