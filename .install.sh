@@ -1,7 +1,14 @@
 #!/bin/bash
+#
+# automatron.sh
+#  by Dawid Rycerz <kontakt@dawidrycerz.pl>
+#
+# Python Conda distribution with automation modules.
+
 
 function usage() {
-	echo "-f	force installation + silentmode"
+	echo "./automatron.sh [args]"
+	echo "-f	force installation"
 	echo "-p	installation path (default: ~/miniconda)"
 	exit 1
 }
@@ -18,10 +25,7 @@ function process_parameters() {
 			;;
 		esac
 	done
-
-  return 0
 }
-
 
 function main() {
 

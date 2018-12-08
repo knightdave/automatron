@@ -57,6 +57,23 @@ function install_package_auto(){
     testcase_success ${FUNCNAME[0]} 
 }
 
+function install_package_auto(){
+    print_testcase ${FUNCNAME[0]}
+    sh automatron.sh
+    [[ -d ~/miniconda ]] || testcase_fail ${FUNCNAME[0]}
+    export PATH="${HOME}/miniconda/bin:$PATH"
+    python -c "import ansible" || testcase_fail ${FUNCNAME[0]}
+    testcase_success ${FUNCNAME[0]} 
+}
+
+function install_package_force(){
+    print_testcase ${FUNCNAME[0]}
+    sh automatron.sh -f
+    [[ -d ~/miniconda ]] || testcase_fail ${FUNCNAME[0]}
+    export PATH="${HOME}/miniconda/bin:$PATH"
+    python -c "import ansible" || testcase_fail ${FUNCNAME[0]}
+    testcase_success ${FUNCNAME[0]} 
+}
 
 function main(){
     cleanup
@@ -67,6 +84,7 @@ function main(){
     upgrade_pip
     create_package_auto
     install_package_auto
+    install_package_force
     cleanup
     exit 0
 }

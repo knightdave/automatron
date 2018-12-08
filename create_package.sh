@@ -1,5 +1,12 @@
 #!/bin/bash
-
+#
+# create_package.sh
+#  by Dawid Rycerz <kontakt@dawidrycerz.pl>
+#
+# Utility to create python Conda distribution with automation modules.
+# The resulting archive is a auto decompressing archive wit
+# minicoda bundled and python automation modules that can be
+# easly installed and used without root access.
 
 function print_error(){
 	echo "[$(date)] [ERROR] ${@}"
@@ -7,9 +14,11 @@ function print_error(){
 }
 
 function usage() {
+	echo "./create_package.sh [args]"
 	echo "-t	temporary dir (default current dir)"
 	echo "-r	path to requirements.txt file"
 	echo "-k	keep files for future (default not keep)"
+	echo "-p    force use python version (2 or 3)"
 	exit 1
 }
 
@@ -23,19 +32,14 @@ function process_parameters() {
 			;;
 			k) KEEP=true
 			;;
+			p) PYTHON_VERSION="${OPTARG}"
+			;;
 			*) usage
 			;;
 		esac
 	done
 
   return 0
-}
-
-function check_pip_version() {
-	PIP_VERSION=$(pip --version | awk -F'[" ".]' '{print $2}')
-	if [[ $PIP_VERSION -lt $MIN_PIP_VERSION ]]; then
-		print_error "Your pip version is lower then minimal $MIN_PIP_VERSION. Please upgrade pip."
-	fi
 }
 
 function check_python_version() {
@@ -46,6 +50,23 @@ function check_python_version() {
 		DOWNLOAD=$MINICONDA3
 	else
 		print_error "Cannot check python version. Check is python exists in your PATH"
+	fi
+}
+
+function my_pip() {
+	if [[ $PYTHON_VERSION = 2 ]]; then
+		python -m pip "${@}"
+	elif [[ $PYTHON_VERSION = 3 ]]; then
+		python3 -m pip "${@}"
+	else
+		print_error "Wrong Python version: $PYTHON_VERSION"
+	fi
+}
+
+function check_pip_version() {
+	PIP_VERSION=$(my_pip --version | awk -F'[" ".]' '{print $2}')
+	if [[ $PIP_VERSION -lt $MIN_PIP_VERSION ]]; then
+		print_error "Your pip version is lower then minimal $MIN_PIP_VERSION. Please upgrade pip."
 	fi
 }
 
@@ -73,14 +94,16 @@ function cleanup() {
 
 function main() {
 	process_parameters "${@}"
+	if [[ ${PYTHON_VERSION}x = x ]]; then
+		check_python_version
+	fi
 	check_pip_version
-	check_python_version
 	prepare_environment
 
 	if [[ "${REQUIREMENTS_FILE}x" = "x" ]]; then
-		pip download -d "${TMPDIR}"/automatr/packages $DEFAULT_PKGS
+		my_pip download -d "${TMPDIR}"/automatr/packages $DEFAULT_PKGS
 	else
-		pip download -d "${TMPDIR}"/automatr/packages -r ${REQUIREMENTS_FILE}
+		my_pip download -d "${TMPDIR}"/automatr/packages -r ${REQUIREMENTS_FILE}
 	fi
 	cp ${DIRECTORY}/.install.sh "${TMPDIR}"/automatr/install.sh
 
@@ -95,7 +118,7 @@ function main() {
 #GLOBAL VARIABLES
 ##########################
 DIRECTORY=$(dirname $0)
-PYTHON_VERSION=2
+PYTHON_VERSION=""
 REQUIREMENTS_FILE=""
 MINICONDA2="https://repo.anaconda.com/miniconda/Miniconda2-latest-Linux-x86_64.sh"
 MINICONDA3="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
