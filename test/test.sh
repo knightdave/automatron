@@ -68,7 +68,7 @@ function install_package_auto(){
 
 function install_package_force(){
     print_testcase ${FUNCNAME[0]}
-    sh automatron.sh -f
+    sh automatron.sh -- -f
     [[ -d ~/miniconda ]] || testcase_fail ${FUNCNAME[0]}
     export PATH="${HOME}/miniconda/bin:$PATH"
     python -c "import ansible" || testcase_fail ${FUNCNAME[0]}

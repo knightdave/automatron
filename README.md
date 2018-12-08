@@ -39,7 +39,7 @@ The syntacs of automatron is following
     - `-k` : keep files for future (default if to not keep)
     - `-p` : force use python version (2 or 3)
 
-`./automatron.sh [args]`
+`./automatron.sh -- [args]`
 - args are optional:
     - `-f` : force installation
     - `-p` : installation path (default: ~/miniconda)
