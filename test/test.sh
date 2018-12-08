@@ -85,8 +85,6 @@ function main(){
     create_package_auto
     install_package_auto
     install_package_force
-    cleanup
-    exit 0
 }
 
 PREFIX=$(pwd)/testprefix/somelocation
