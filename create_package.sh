@@ -104,6 +104,7 @@ function main() {
 		my_pip download -d "${TMP_PATH}/automatron/packages" ${DEFAULT_PKGS}
 	else
 		my_pip download -d "${TMP_PATH}/automatron/packages" -r ${REQUIREMENTS_FILE}
+		cp ${REQUIREMENTS_FILE} ${TMP_PATH}/automatron
 	fi
 	cp "${MAIN_DIRECTORY}/.install.sh" "${TMP_PATH}/automatron/install.sh"
 
